@@ -91,7 +91,7 @@ const Header = () => {
                         </Link>
                     </div>
 
-                    <div className="hidden h-full lg:flex">
+                    <div className="hidden h-full md:flex">
                         {/* Flyout menus */}
                         <div className="flex h-full items-center space-x-8">
                             {navigation.pages.map((page) => (
@@ -107,20 +107,20 @@ const Header = () => {
                     </div>
 
                     {/* Mobile menu and search (lg-) */}
-                    <div className="flex flex-1 items-center lg:hidden">
+                    <div className="flex md:hidden">
                         <button type="button" className="-ml-2 p-2 text-white" onClick={() => setMobileMenuOpen(true)}>
                         <span className="sr-only">Open menu</span>
                         <Bars3Icon className="h-6 w-6" aria-hidden="true" />
                         </button>
                     </div>
-
-                    {/* Logo (lg-) */}
-                    <a href="#" className="lg:hidden">
-                        <span className="sr-only">Your Company</span>
-                        <img src="https://tailwindui.com/img/logos/mark.svg?color=white" alt="" className="h-8 w-auto" />
-                    </a>
-                    {/* Sign in and create new account  */}
-                    <div className="flex items-center justify-end">
+                              
+                    <div className='flex items-center'>
+                      {/* Logo (lg-) */}
+                      <a href="#" className="lg:hidden">
+                          <span className="sr-only">Your Company</span>
+                          <img src="https://tailwindui.com/img/logos/mark.svg?color=white" alt="" className="h-8 w-auto mx-2" />
+                      </a>
+                      {/* Sign in and create new account  */}
                         <div className="mx-auto flex h-10 max-w-7xl items-center justify-end">
                             <div className="flex items-center space-x-6">
                               {isLogin 

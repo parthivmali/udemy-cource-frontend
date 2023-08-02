@@ -1,8 +1,8 @@
 import { useFormik } from "formik"
 import { Link, useNavigate } from "react-router-dom"
-import { LoginSchema } from "../schemas/LoginSchema";
-import { ILogin } from "../interfaces";
-import { userLogin } from "../services/Auth-services";
+import { LoginSchema } from "../../schemas/LoginSchema";
+import { ILogin } from "../../interfaces";
+import { userLogin } from "../../services/Auth-services";
 import Swal from "sweetalert2";
 import { AxiosError} from "axios";
 

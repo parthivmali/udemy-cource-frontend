@@ -1,7 +1,6 @@
 import axios, { AxiosResponse } from "axios"
-import { ISignin,ILogin, IApiResponse } from "../interfaces"
+import { ISignin,ILogin, IApiResponse, IAddPlace } from "../interfaces"
 import { AuthHeader } from "./Auth-Header"
-// import { AuthHeader } from "./Auth-Header"
 
 const API_URL = "http://localhost:5000/"
 
@@ -15,8 +14,7 @@ return await axios.post(`${API_URL}api/users/signup`, data)
 export const userLogin = async (logData: ILogin) => {
   try {
     const res: AxiosResponse<IApiResponse | string> = await axios.post(`${API_URL}api/users/login`, logData);
-    console.log(res);
-    if (typeof res.data === 'string' && res.data === 'Logged in successfully') {
+    if (res.data) {
       localStorage.setItem('user', JSON.stringify(res.data));
     }
     return res.data;
@@ -34,4 +32,42 @@ export const getAllUsers = async () => {
   } catch (error) {
       console.log(error);
   }
+}
+
+
+// ----------------------------------------------------------------
+
+//Add place :
+
+export const addPlace = async (createdPlace:IAddPlace) => {
+  return await axios.post(`${API_URL}api/places`,createdPlace)
+}
+
+//Get All Places :
+export const getAllPlaces = async () => {
+  try {
+      const getLocalData = localStorage.getItem('user')
+      let res; 
+      if(getLocalData){
+        const localData = JSON.parse(getLocalData);
+        res = await axios.get(`${API_URL}api/places/user/${localData._id}`,{headers: AuthHeader()});
+      }
+    return res
+  } catch (error) {
+    console.log(error);   
+  }
+}
+
+// Get Single user place :
+export const getSinglePlaces = async (id:string) => {
+  console.log(id);
+  try {
+    let res; 
+    if(id){
+      res = await axios.get(`${API_URL}api/places/user/${id}`,{headers: AuthHeader()});
+    }
+    return res
+} catch (error) {
+  console.log(error);   
+}
 }
