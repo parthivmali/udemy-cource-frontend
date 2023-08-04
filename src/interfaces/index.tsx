@@ -22,6 +22,7 @@ export interface IGetAllUsers {
 }
 
 export interface IGetAllPlaces {
+    _id: string;
     title: string;
     description: string;
     image: string;
@@ -37,4 +38,9 @@ export interface IAddPlace {
 
 export interface ICreatorId {
     creator?: string;
+}
+
+export interface IUpdatePlace {
+    title: string;
+    description: string;
 }

@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios"
-import { ISignin,ILogin, IApiResponse, IAddPlace } from "../interfaces"
+import { ISignin,ILogin, IApiResponse, IAddPlace, IUpdatePlace } from "../interfaces"
 import { AuthHeader } from "./Auth-Header"
 
 const API_URL = "http://localhost:5000/"
@@ -39,7 +39,7 @@ export const getAllUsers = async () => {
 
 //Add place :
 
-export const addPlace = async (createdPlace:IAddPlace) => {
+export const addPlace = async (createdPlace:any) => {
   return await axios.post(`${API_URL}api/places`,createdPlace)
 }
 
@@ -67,7 +67,30 @@ export const getSinglePlaces = async (id:string) => {
       res = await axios.get(`${API_URL}api/places/user/${id}`,{headers: AuthHeader()});
     }
     return res
-} catch (error) {
-  console.log(error);   
+  } catch (error) {
+    console.log(error);   
+  }
 }
+
+// Update Place
+
+export const SingleUpdatedPlace = async (id:string,place:any) => {
+  // console.log("id and place both =>",id,place);
+  try {
+    const res = await axios.patch(`${API_URL}api/places/${id}`, place, {headers: AuthHeader()})
+    // console.log("API Side =>",res);
+    return res
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Delete Place 
+export const DeletePlace = async (id:string) => {
+  try {
+    const res = await axios.delete(`${API_URL}api/places/${id}`, {headers: AuthHeader()});
+    return res
+  } catch (error) {
+    console.log("Authentication Error=>",error);
+  }
 }

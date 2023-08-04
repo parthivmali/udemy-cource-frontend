@@ -16,7 +16,7 @@ const Login = () => {
     },
     validationSchema:LoginSchema,
     onSubmit: (values : ILogin) => {
-      console.log(values);
+      // console.log(values);
       const {email, password} = values
       const loginData = {
         email,

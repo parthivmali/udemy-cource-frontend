@@ -1,14 +1,20 @@
 import { useFormik } from "formik"
 import { IAddPlace, IApiResponse } from "../interfaces";
 import { AddPlaceSchema } from "../schemas/AddPlaceSchema";
-import { addPlace } from "../services/Auth-services";
+import { SingleUpdatedPlace, addPlace } from "../services/Auth-services";
 import { useEffect, useState } from "react";
-// import { AxiosError, AxiosResponse } from "axios";
-// import Swal from "sweetalert2";
+import Swal from "sweetalert2";
+import { useLocation, useNavigate } from "react-router-dom";
+import Toaster from "../hooks/Toaster";
 
 const AddPlace = () => {
   const [data, setData] = useState<IApiResponse>()
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const editId = location.state?.id
+  const editData = location.state?.person
+
   useEffect(() => {
     const getLocalData = localStorage.getItem('user')
     if(getLocalData){
@@ -17,30 +23,71 @@ const AddPlace = () => {
     }
   }, [])
   
+  useEffect(() => {
+    if (editData) {
+      formik.setValues({
+        title: editData.title,
+        description: editData.description,
+        address: editData.address || '',
+      });
+    }
+  }, [editData]);
+
+  const initialValues: IAddPlace = {
+    creator: data?._id,
+    title: '',
+    description: '',
+    address: '',
+  };
+  
   const formik = useFormik({
-    initialValues: {
-      creator : data?._id,
-      title:'',
-      description:'',
-      address:''
-    },
+    initialValues,
     validationSchema:AddPlaceSchema,
-    onSubmit: (values : IAddPlace) => {
-      console.log(values);
+    onSubmit: async (values : IAddPlace) => {
+      // console.log("values =>",values);
       const {title, description, address} = values;
-      const createdPlace:IAddPlace = {
-        creator : data?._id,
-        title,
-        description,
-        address
+      try {
+        if (editData) {
+          const updatedPlace = {
+            title,
+            description,
+          };
+          // console.log("updatedPlace =>",updatedPlace);
+          await SingleUpdatedPlace(editId, updatedPlace)
+          .then((res) => {
+            if(res){
+              Toaster.success("Place Update Successfully!");
+              navigate('/places');
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+        } else {
+          const createdPlace:IAddPlace = {
+            creator : data?._id,
+            title,
+            description,
+            address
+          }
+          addPlace(createdPlace)
+          .then((res) => {
+            if(res){
+              void Swal.fire({
+                icon: 'success',
+                title: 'Place Added Successfully!',
+                })
+            }
+            // console.log(res);
+            formik.resetForm()
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+        }
+      } catch (error) {
+        console.log("Error response from server:", error);
       }
-      addPlace(createdPlace)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
     }
   })
   return (
@@ -55,7 +102,7 @@ const AddPlace = () => {
         <div className="relative z-10">
           <div className="mx-auto sm:max-w-sm">
             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
-              Add Your Place . . . .
+            {editData ? "Update Your Place":"Add Your Place..."}
             </h2>
           </div>
 
@@ -96,31 +143,32 @@ const AddPlace = () => {
                   {formik.errors.description && formik.touched.description ? <p className="text-red-500 flex items-center">{formik.errors.description}</p> : null}
                 </div>
               </div>
-
-              <div>
-                  <label htmlFor="address" className="block text-sm font-medium leading-6 text-white">
-                    Address
-                  </label>
-                <div className="mt-2">
-                  <input
-                    id="address"
-                    name="address"
-                    type="text"
-                    autoComplete="address"
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    className="block w-full rounded-md border-0 bg-white/5 p-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-white sm:text-sm sm:leading-6"
-                  />
-                  {formik.errors.address && formik.touched.address ? <p className="text-red-500 flex items-center">{formik.errors.address}</p> : null}
+              {!editData && (
+                <div>
+                    <label htmlFor="address" className="block text-sm font-medium leading-6 text-white">
+                      Address
+                    </label>
+                  <div className="mt-2">
+                    <input
+                      id="address"
+                      name="address"
+                      type="text"
+                      autoComplete="address"
+                      value={formik.values.address}
+                      onChange={formik.handleChange}
+                      className="block w-full rounded-md border-0 bg-white/5 p-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-white sm:text-sm sm:leading-6"
+                    />
+                    {formik.errors.address && formik.touched.address ? <p className="text-red-500 flex items-center">{formik.errors.address}</p> : null}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
                 <button
                   type="submit"
                   className="flex w-full justify-center rounded-md bg-indigo-700 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                 >
-                  Add Place
+                {editData ? "Update Place":"Add Place..."}
                 </button>
               </div>
             </form>

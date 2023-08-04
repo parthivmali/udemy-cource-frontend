@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react"
-import { getAllPlaces } from "../services/Auth-services"
+import { DeletePlace, getAllPlaces } from "../services/Auth-services"
 import { IApiResponse, ICreatorId, IGetAllPlaces } from "../interfaces"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
+import Toaster from "../hooks/Toaster"
 
 
 const MyPlaces = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
     const [placesData, setPlacesData] = useState([])
     const [currentUserPlaces, setCurrentUserPlaces] = useState([]);
+    
     const [data, setData] = useState<IApiResponse>()
-    const location = useLocation();
 
     const singleUserPlace = location.state?.singleUserPlace || [];
-    console.log("Received singleUserPlace =>", singleUserPlace);
-
     let place;
     const getPlaces = async() => {
         await getAllPlaces() 
@@ -35,14 +37,30 @@ const MyPlaces = () => {
       setData(localData);
     }
   }, [])
-  
-    const loggedInUserId = data?._id
 
-    useEffect(() => {
-        setCurrentUserPlaces(placesData.filter((place:ICreatorId) => place.creator === loggedInUserId));
-      }, [placesData, loggedInUserId]);
+  const loggedInUserId = data?._id
+  useEffect(() => {
+    setCurrentUserPlaces(placesData.filter((place:ICreatorId) => place.creator === loggedInUserId));
+  }, [placesData, loggedInUserId]);
+  const combinedData = singleUserPlace.length !== 0 ? singleUserPlace : currentUserPlaces;
 
-    const combinedData = singleUserPlace.length !== 0 ? singleUserPlace : currentUserPlaces;
+  const handleUpdate = (id:string,person:IGetAllPlaces) => {
+    navigate('/create-place', {state: {id , person}})
+  }
+
+  const handleDelete = (id:string) => {
+    DeletePlace(id)
+    .then((res) => {
+      setPlacesData((prevData) => prevData.filter((place:any) => place._id !== id));
+      if(res){
+        Toaster.success(`Delete Successfully`);
+      }
+    })
+    .catch((err) => {
+      console.log(err);      
+    })
+  }
+
   return (
     <div className="relative">
       <img
@@ -66,8 +84,8 @@ const MyPlaces = () => {
             </div>
             <div className="border-t mt-4 flex items-center justify-around">
                 <button className="border border-pink-500 p-1 px-2 text-center font-bold text-pink-600 hover:bg-pink-600 hover:text-white my-3">VIEW ON MAP</button>
-                <button className="p-1 px-5 text-center font-bold bg-pink-700 text-white hover:bg-pink-600 my-3">EDIT</button>
-                <button className="p-1 px-3 text-center font-bold bg-orange-800 hover:bg-orange-900 text-white my-3">DELETE</button>
+                <button className="p-1 px-5 text-center font-bold bg-pink-700 text-white hover:bg-pink-600 my-3" onClick={() => handleUpdate(person._id, person)}>EDIT</button>
+                <button className="p-1 px-3 text-center font-bold bg-orange-800 hover:bg-orange-900 text-white my-3" onClick={() => handleDelete(person._id,)}>DELETE</button>
             </div>
             </li>
         ))}

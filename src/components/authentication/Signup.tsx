@@ -16,7 +16,7 @@ const Signup = () => {
     },
     validationSchema:SignupSchema,
     onSubmit: (values : ISignin) => {
-      console.log(values);
+      // console.log(values);
       const {name , email, password} = values
       const signupData = {
         name,
