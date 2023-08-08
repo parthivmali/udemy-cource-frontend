@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { getAllUsers, getSinglePlaces } from "../services/Auth-services"
 import { IGetAllUsers } from "../interfaces"
 import { useNavigate } from "react-router-dom"
+import Toaster from "../hooks/Toaster"
 
 
 
@@ -31,10 +32,14 @@ const AllUsers = () => {
         getSinglePlaces(id)
         .then((res) => {
             const place = res?.data.places
-            setSingleUserPlace(place)
-            navigate('/places',{ state: { singleUserPlace: place } })
+            console.log("Place Data:", place.length);
+            if(place.length > 0){
+                setSingleUserPlace(place)
+                navigate('/places',{ state: { singleUserPlace: place } })
+            }
         }).catch((err) => {
-            console.log(err);
+            console.log(err.response.data);
+            Toaster.error(err.response.data)
         });
     }
     

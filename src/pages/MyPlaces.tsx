@@ -15,6 +15,7 @@ const MyPlaces = () => {
     const [data, setData] = useState<IApiResponse>()
 
     const singleUserPlace = location.state?.singleUserPlace || [];
+    
     let place;
     const getPlaces = async() => {
         await getAllPlaces() 
@@ -38,10 +39,11 @@ const MyPlaces = () => {
     }
   }, [])
 
-  const loggedInUserId = data?._id
+  const loggedInUserId = data?.userId
   useEffect(() => {
     setCurrentUserPlaces(placesData.filter((place:ICreatorId) => place.creator === loggedInUserId));
   }, [placesData, loggedInUserId]);
+
   const combinedData = singleUserPlace.length !== 0 ? singleUserPlace : currentUserPlaces;
 
   const handleUpdate = (id:string,person:IGetAllPlaces) => {
@@ -51,7 +53,7 @@ const MyPlaces = () => {
   const handleDelete = (id:string) => {
     DeletePlace(id)
     .then((res) => {
-      setPlacesData((prevData) => prevData.filter((place:any) => place._id !== id));
+      setPlacesData((prevData) => prevData.filter((place:IGetAllPlaces) => place._id !== id));
       if(res){
         Toaster.success(`Delete Successfully`);
       }

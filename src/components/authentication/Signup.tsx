@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom"
 import { ISignin } from "../../interfaces";
 import { SignupSchema } from "../../schemas/SignupSchema";
 import { userSignup } from "../../services/Auth-services";
-import { AxiosError, AxiosResponse } from "axios";
 import Swal from "sweetalert2";
+
 
 const Signup = () => {
   const navigate = useNavigate()
@@ -15,27 +15,25 @@ const Signup = () => {
       password:''
     },
     validationSchema:SignupSchema,
-    onSubmit: (values : ISignin) => {
+    onSubmit: async (values : ISignin) => {
       // console.log(values);
-      const {name , email, password} = values
+      const { name , email, password} = values
       const signupData = {
         name,
         email,
         password
+      };
+      try {
+        const response = await userSignup(signupData);
+        console.log(response);
+        await Swal.fire({
+          icon: "success",
+          title: "Registration Successful",
+        });
+        navigate("/login");
+      } catch (error) {
+        console.log(error);
       }
-      userSignup(signupData)
-      .then((res:AxiosResponse<string>)=>{
-        console.log(res);
-        
-        void Swal.fire({
-          icon: 'success',
-          title: 'Registration Successful',
-        }).then(() => {
-            navigate('/login')
-        });  
-      }).catch((err:AxiosError<string>)=>{
-        console.log(err);
-      })
     }
   })
   return (
@@ -51,18 +49,13 @@ const Signup = () => {
       <div aria-hidden="true" className="absolute inset-0 bg-gray-900 opacity-50 "/>
         <div className="relative z-10">
           <div className="mx-auto sm:max-w-sm">
-            <img
-              className="mx-auto h-10 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-              alt="Your Company"
-            />
             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
               Sign up to your account
             </h2>
           </div>
 
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form className="space-y-6" action="#" method="POST" onSubmit={formik.handleSubmit}>
+            <form className="space-y-3" action="#" method="POST" onSubmit={formik.handleSubmit}>
               <div>
                 <label htmlFor="name" className="block text-sm font-medium leading-6 text-white">
                   Name
@@ -116,7 +109,6 @@ const Signup = () => {
                   {formik.errors.password && formik.touched.password ? <p className="text-red-500 flex items-center">{formik.errors.password}</p> : null}
                 </div>
               </div>
-
               <div>
                 <button
                   type="submit"

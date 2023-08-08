@@ -34,7 +34,7 @@ const AddPlace = () => {
   }, [editData]);
 
   const initialValues: IAddPlace = {
-    creator: data?._id,
+    creator: data?.userId,
     title: '',
     description: '',
     address: '',
@@ -44,7 +44,7 @@ const AddPlace = () => {
     initialValues,
     validationSchema:AddPlaceSchema,
     onSubmit: async (values : IAddPlace) => {
-      // console.log("values =>",values);
+      console.log("values =>",values);
       const {title, description, address} = values;
       try {
         if (editData) {
@@ -64,8 +64,8 @@ const AddPlace = () => {
             console.log(err);
           })
         } else {
-          const createdPlace:IAddPlace = {
-            creator : data?._id,
+          const createdPlace = {
+            creator : data?.userId,
             title,
             description,
             address
@@ -82,7 +82,7 @@ const AddPlace = () => {
             formik.resetForm()
           })
           .catch((err) => {
-            console.log(err);
+            console.log("error",err);
           })
         }
       } catch (error) {

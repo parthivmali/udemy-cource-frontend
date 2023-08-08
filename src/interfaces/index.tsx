@@ -10,8 +10,9 @@ export interface ILogin {
 }
 
 export interface IApiResponse {
-    message: string;
-    _id: string
+    email: string;
+    userId: string;
+    token: string;
 }
 
 export interface IGetAllUsers {
@@ -43,4 +44,8 @@ export interface ICreatorId {
 export interface IUpdatePlace {
     title: string;
     description: string;
+}
+
+export interface IFileWithType {
+    type: string;
 }

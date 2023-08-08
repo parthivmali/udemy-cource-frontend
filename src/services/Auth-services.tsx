@@ -1,19 +1,19 @@
 import axios, { AxiosResponse } from "axios"
-import { ISignin,ILogin, IApiResponse, IAddPlace, IUpdatePlace } from "../interfaces"
+import { ISignin,ILogin, IApiResponse, IAddPlace, IUpdatePlace} from "../interfaces"
 import { AuthHeader } from "./Auth-Header"
 
 const API_URL = "http://localhost:5000/"
 
 
 //Signup User
-export const userSignup = async (data:ISignin) => {
+export const userSignup = async (data: ISignin) => {
 return await axios.post(`${API_URL}api/users/signup`, data)
 }
 
 //Login User
 export const userLogin = async (logData: ILogin) => {
   try {
-    const res: AxiosResponse<IApiResponse | string> = await axios.post(`${API_URL}api/users/login`, logData);
+    const res: AxiosResponse<IApiResponse | string> = await axios.post(`${API_URL}api/users/login`, logData, {headers: AuthHeader()});
     if (res.data) {
       localStorage.setItem('user', JSON.stringify(res.data));
     }
@@ -39,8 +39,16 @@ export const getAllUsers = async () => {
 
 //Add place :
 
-export const addPlace = async (createdPlace:any) => {
-  return await axios.post(`${API_URL}api/places`,createdPlace)
+
+export const addPlace = async (createdPlace:IAddPlace) => {
+  console.log("createdPlace =>", createdPlace);
+  try {
+    const response = await axios.post(`${API_URL}api/places`, createdPlace ,{headers: AuthHeader()});
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.log("Error =>",error);
+  }
 }
 
 //Get All Places :
@@ -50,7 +58,7 @@ export const getAllPlaces = async () => {
       let res; 
       if(getLocalData){
         const localData = JSON.parse(getLocalData);
-        res = await axios.get(`${API_URL}api/places/user/${localData._id}`,{headers: AuthHeader()});
+        res = await axios.get(`${API_URL}api/places/user/${localData.userId}`,{headers: AuthHeader()});       
       }
     return res
   } catch (error) {
@@ -74,7 +82,7 @@ export const getSinglePlaces = async (id:string) => {
 
 // Update Place
 
-export const SingleUpdatedPlace = async (id:string,place:any) => {
+export const SingleUpdatedPlace = async (id:string,place:IUpdatePlace) => {
   // console.log("id and place both =>",id,place);
   try {
     const res = await axios.patch(`${API_URL}api/places/${id}`, place, {headers: AuthHeader()})
